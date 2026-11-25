@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#172720">
+  <title>中国象棋 · Moon GameHub</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <a href="../?game=xiangqi" class="home">← 月灯公会</a>
+    <button class="quiet" id="history" type="button">我的棋谱</button>
+  </header>
+  <main class="layout">
+    <section class="board-area" aria-label="中国象棋棋盘">
+      <div class="player" id="top-player" hidden></div>
+      <div class="board">
+        <canvas id="lines" aria-hidden="true"></canvas>
+        <div id="river" aria-hidden="true"><span>楚河</span><span>漢界</span></div>
+        <div id="squares" aria-label="棋盘交叉点"></div>
+      </div>
+      <div class="player" id="bottom-player" hidden></div>
+    </section>
+
+    <section class="side">
+      <h1 id="title">中国象棋</h1>
+      <div id="notice" role="alert" hidden></div>
+
+      <div id="lobby">
+        <p class="lead">在公会棋室摆下楚河汉界，等搭档落座。</p>
+        <a class="primary button wide" href="../?game=xiangqi">回公会棋室</a>
+        <details>
+        <summary>自行设局</summary>
+        <form id="create-form">
+          <div class="setup">
+            <div>
+              <label for="setting-time">每方用时</label>
+              <select id="setting-time">
+                <option value="0">不限时</option><option value="1">1 分钟</option>
+                <option value="3">3 分钟</option><option value="5">5 分钟</option>
+                <option value="10">10 分钟</option><option value="15">15 分钟</option>
+                <option value="30">30 分钟</option><option value="60">60 分钟</option>
+              </select>
+            </div>
+            <div>
+              <label for="setting-first">让先</label>
+              <select id="setting-first">
+                <option value="r1">红先 · 标准</option><option value="b1">黑方先走 1 步</option>
+                <option value="r2">红方先走 2 步</option><option value="b2">黑方先走 2 步</option>
+                <option value="r3">红方先走 3 步</option><option value="b3">黑方先走 3 步</option>
+              </select>
+            </div>
+            <div>
+              <label for="setting-handicap">让子</label>
+              <select id="setting-handicap">
+                <option value="none">不让子</option><option value="horse">让单马</option>
+                <option value="horses">让双马</option><option value="rook">让单车</option>
+                <option value="rook-horse">让车马</option><option value="rooks">让双车</option>
+              </select>
+            </div>
+            <div id="giver-field" hidden>
+              <label for="setting-giver">让子方</label>
+              <select id="setting-giver">
+                <option value="r">红方去子</option><option value="b">黑方去子</option>
+              </select>
+            </div>
+          </div>
+          <button class="primary wide" id="create" type="submit">创建房间</button>
+        </form>
+        <form id="join-form" class="join">
+          <label for="code">有好友房号？</label>
+          <div class="field-row">
+            <input id="code" type="text" placeholder="输入 8 位房号" maxlength="8" autocomplete="off" spellcheck="false" autocapitalize="characters" required>
+            <button type="submit">入座</button>
+          </div>
+        </form>
+        </details>
+        <button class="quiet" id="resume" type="button" hidden>回到上次房间</button>
+      </div>
+
+      <div id="invited" hidden>
+        <p class="lead" id="invitation-label"></p>
+        <p class="game-settings" id="invitation-settings" hidden></p>
+        <button class="primary wide" id="accept" type="button">入座开局</button>
+        <button class="quiet" id="invite-back" type="button">返回大厅</button>
+      </div>
+
+      <div id="room" hidden>
+        <div class="room-info"><span id="room-number"></span><span id="connection" role="status"></span></div>
+        <p class="game-settings" id="room-settings"></p>
+        <section class="offer" id="offer" hidden>
+          <p id="offer-text" role="status"></p>
+          <div class="round-tools">
+            <button id="offer-decline" type="button">拒绝</button>
+            <button id="offer-accept" class="primary" type="button">同意</button>
+            <button id="offer-cancel" type="button">撤回申请</button>
+          </div>
+        </section>
+        <p class="offer-feedback" id="offer-feedback" role="status" hidden></p>
+        <h2 id="phase" aria-live="polite"></h2>
+        <p id="detail"></p>
+        <div id="invite-tools" hidden>
+          <label for="invite-link">邀请链接</label>
+          <div class="field-row">
+            <input id="invite-link" type="url" readonly>
+            <button id="copy-invite" class="primary" type="button">复制</button>
+          </div>
+        </div>
+        <div id="round-tools" class="round-tools" hidden>
+          <button id="review" type="button">复盘本局</button>
+          <button id="rematch" class="primary" type="button">再来一局</button>
+        </div>
+        <div id="play-tools" class="round-tools" hidden>
+          <button id="undo" type="button">悔棋</button>
+          <button id="draw" type="button">求和</button>
+        </div>
+        <div class="room-footer">
+          <button class="quiet" id="back" type="button">返回大厅</button>
+          <button class="quiet" id="resign" type="button" hidden>认输</button>
+        </div>
+      </div>
+
+      <div id="replay" hidden>
+        <p class="lead" id="replay-result"></p>
+        <p class="game-settings" id="replay-settings"></p>
+        <div class="replay-controls" aria-label="复盘控制">
+          <button type="button" id="first" aria-label="初始局面">⏮</button>
+          <button type="button" id="prev" aria-label="上一步">←</button>
+          <output id="step-count"></output>
+          <button type="button" id="next" aria-label="下一步">→</button>
+          <button type="button" id="last" aria-label="最终局面">⏭</button>
+        </div>
+        <input id="timeline" type="range" min="0" value="0" aria-label="选择复盘步数">
+        <div class="round-tools">
+          <a id="download" class="button" download>下载棋谱</a>
+          <button id="share-replay" class="primary" type="button">复制复盘链接</button>
+        </div>
+        <button class="quiet" id="replay-back" type="button">返回大厅</button>
+      </div>
+
+      <section id="scoresheet" class="scoresheet" hidden>
+        <h2>走子记录</h2>
+        <ol id="moves"></ol>
+      </section>
+      <p id="toast" class="toast" role="status"></p>
+    </section>
+  </main>
+
+  <dialog id="confirm-resign">
+    <form method="dialog">
+      <h2>确认认输？</h2>
+      <p>对方将获胜，当前棋谱会保存。</p>
+      <div class="round-tools">
+        <button value="cancel">继续对弈</button>
+        <button value="resign" class="primary">确认认输</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="archive-dialog">
+    <div class="archive-head"><h2>我的棋谱</h2><form method="dialog"><button aria-label="关闭棋谱">关闭</button></form></div>
+    <p id="archive-empty">对局结束后，棋谱会出现在这里。</p>
+    <ul id="archives"></ul>
+  </dialog>
+</body>
+</html>

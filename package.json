@@ -1,0 +1,7 @@
+{
+  "name": "moon-gamehub-xiangqi",
+  "version": "1.0.0",
+  "private": true,
+  "engines": { "node": ">=24.0.0" },
+  "scripts": { "start": "node server.cjs" }
+}

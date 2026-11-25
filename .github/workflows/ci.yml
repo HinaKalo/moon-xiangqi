@@ -1,0 +1,22 @@
+# CI：每次推送与 PR 运行检查与安全扫描。
+# 中国象棋以 systemd 原生服务运行在 moon 的 GameHub 下（见 gamehub-xiangqi.service），暂不走容器发布流水线。
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: HinaKalo/moon-infra/.github/workflows/ci-node.yml@main
+
+  security:
+    uses: HinaKalo/moon-infra/.github/workflows/security.yml@main
+    permissions:
+      contents: read
+      security-events: write
+      actions: read

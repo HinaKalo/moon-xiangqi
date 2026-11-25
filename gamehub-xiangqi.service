@@ -1,0 +1,25 @@
+[Unit]
+Description=Moon GameHub Xiangqi
+After=network.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+StateDirectory=gamehub-xiangqi
+WorkingDirectory=/opt/xiangqi/current
+ExecStart=/opt/pokemon-showdown/runtime/current/bin/node server.cjs
+Environment=NODE_ENV=production
+Environment=PORT=18798
+Environment=BASE_PATH=/gamehub/xiangqi
+Environment=PUBLIC_ORIGIN=https://release.moonl.cloud
+Environment=DB_PATH=/var/lib/gamehub-xiangqi/rooms.sqlite
+Environment=TRUST_PROXY=1
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+
+[Install]
+WantedBy=multi-user.target
